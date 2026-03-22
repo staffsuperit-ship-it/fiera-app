@@ -15,7 +15,6 @@ export default function Home() {
   const [email, setEmail] = useState('')
   const [note, setNote] = useState('')
   const [lingua, setLingua] = useState('it')
-  const [fileFoto, setFileFoto] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -32,30 +31,17 @@ export default function Home() {
     e.preventDefault()
     setLoading(true)
 
-    // --- QUI MODIFICHI I LINK WHATSAPP ---
-    const linkToddeBus = "https://www.graficapubblicita.com/catalogo-todde" // <--- CAMBIA QUI
-    const linkMtExplore = "https://www.graficapubblicita.com/catalogo-mt"  // <--- CAMBIA QUI
-    // -------------------------------------
-
-    let fotoUrl = null
-
-    if (fileFoto) {
-      // Usiamo il timestamp per rendere il file unico ed evitare errori di visualizzazione
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`
-      const { data: upData, error: upError } = await supabase.storage
-        .from('biglietti-visita')
-        .upload(fileName, fileFoto)
-      
-      if (upData) {
-        const { data: publicUrlData } = supabase.storage.from('biglietti-visita').getPublicUrl(fileName)
-        fotoUrl = publicUrlData.publicUrl
-      }
-    }
+    // ==========================================
+    // 🔗 IMPOSTA QUI I TUOI LINK DEFINITIVI
+    // ==========================================
+    const linkToddeBus = "https://www.graficapubblicita.com/catalogo-todde" 
+    const linkMtExplore = "https://www.graficapubblicita.com/catalogo-mt"  
+    // ==========================================
 
     const { error } = await supabase.from('contatti').insert([{ 
       nome, cognome, azienda_cliente: aziendaCliente, telefono, email, note, 
       azienda_gruppo: azienda, fiera_id: fieraId, operatore_id: operatoreId || null, 
-      lingua, foto_biglietto_url: fotoUrl 
+      lingua 
     }])
 
     if (!error) {
@@ -66,7 +52,7 @@ export default function Home() {
       
       window.open(`https://wa.me/${telefono.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank')
       
-      setNome(''); setCognome(''); setAziendaCliente(''); setTelefono('+39'); setEmail(''); setNote(''); setFileFoto(null);
+      setNome(''); setCognome(''); setAziendaCliente(''); setTelefono('+39'); setEmail(''); setNote('');
       alert("Contatto Registrato!")
     } else {
       alert("Errore: " + error.message)
@@ -94,25 +80,18 @@ export default function Home() {
           </div>
 
           <div className="flex gap-2">
-            <button type="button" onClick={() => setLingua('it')} className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${lingua === 'it' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-50 text-gray-400'}`}>🇮🇹 ITA</button>
-            <button type="button" onClick={() => setLingua('en')} className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${lingua === 'en' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-50 text-gray-400'}`}>🇬🇧 ENG</button>
+            <button type="button" onClick={() => setLingua('it')} className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${lingua === 'it' ? 'bg-blue-600 border-blue-600 text-white shadow' : 'bg-gray-50 text-gray-400'}`}>🇮🇹 ITA</button>
+            <button type="button" onClick={() => setLingua('en')} className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${lingua === 'en' ? 'bg-blue-600 border-blue-600 text-white shadow' : 'bg-gray-50 text-gray-400'}`}>🇬🇧 ENG</button>
           </div>
 
           <div className="space-y-3">
-            <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required className="w-full p-4 bg-gray-50 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 outline-none" />
-            <input type="text" placeholder="Cognome" value={cognome} onChange={e => setCognome(e.target.value)} required className="w-full p-4 bg-gray-50 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 outline-none" />
-            <input type="text" placeholder="Ragione Sociale Cliente" value={aziendaCliente} onChange={e => setAziendaCliente(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 outline-none" />
-            <input type="tel" placeholder="Cellulare" value={telefono} onChange={e => setTelefono(e.target.value)} required className="w-full p-4 bg-gray-50 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 outline-none" />
-            <input type="email" placeholder="Email (facoltativa)" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 outline-none" />
-            <textarea placeholder="Note e interessi particolari..." value={note} onChange={e => setNote(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl text-black h-24 focus:ring-2 focus:ring-blue-500 outline-none" />
+            <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required className="w-full p-4 bg-gray-50 border rounded-xl text-black" />
+            <input type="text" placeholder="Cognome" value={cognome} onChange={e => setCognome(e.target.value)} required className="w-full p-4 bg-gray-50 border rounded-xl text-black" />
+            <input type="text" placeholder="Ragione Sociale Cliente" value={aziendaCliente} onChange={e => setAziendaCliente(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl text-black" />
+            <input type="tel" placeholder="Cellulare" value={telefono} onChange={e => setTelefono(e.target.value)} required className="w-full p-4 bg-gray-50 border rounded-xl text-black" />
+            <input type="email" placeholder="Email (facoltativa)" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl text-black" />
+            <textarea placeholder="Note e interessi particolari..." value={note} onChange={e => setNote(e.target.value)} className="w-full p-4 bg-gray-50 border rounded-xl text-black h-32" />
           </div>
-
-          <label className="block w-full text-center p-5 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:bg-gray-50 transition-all">
-            <span className="text-sm text-gray-400 font-bold uppercase tracking-tight">
-              {fileFoto ? `📸 ${fileFoto.name.substring(0, 15)}...` : "📷 FOTO BIGLIETTO"}
-            </span>
-            <input type="file" accept="image/*" capture="environment" onChange={e => setFileFoto(e.target.files ? e.target.files[0] : null)} className="hidden" />
-          </label>
 
           <button type="submit" disabled={loading} className={`w-full py-5 rounded-2xl font-black text-white shadow-xl transform active:scale-95 transition-all ${azienda === 'Todde Bus' ? 'bg-blue-600' : 'bg-green-600'}`}>
             {loading ? 'ELABORAZIONE...' : 'REGISTRA E WHATSAPP'}
